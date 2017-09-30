@@ -1,16 +1,16 @@
 #include "table_model.h"
 
-int TableModel::rowCount(const QModelIndex &parent) const
+int TableModel::rowCount(const QModelIndex&) const
 {
 	return 2;
 }
 
-int TableModel::columnCount(const QModelIndex &parent) const
+int TableModel::columnCount(const QModelIndex&) const
 {
 	return 2;
 }
 
-QVariant TableModel::data(const QModelIndex &index, int role) const
+QVariant TableModel::data(const QModelIndex& index, int role) const
 {
 	switch (role)
 	{
