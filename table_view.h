@@ -3,16 +3,17 @@
 #include <QTableView>
 #include <QKeyEvent>
 
-#include <cassert>
-
 class TableView : public QTableView
 {
 public:
 	bool event(QEvent* e) override
 	{
+		/*
 		QModelIndex idx = this->currentIndex();
-
-		if (!mFocus && idx.row() == 0 && e->type() == QEvent::KeyRelease)
+		if (!mFocus
+			&& this->state() == QAbstractItemView::EditingState
+			&& idx.row() == 0
+			&& e->type() == QEvent::KeyRelease)
 		{
 			const QString pressedChar = static_cast<QKeyEvent*>(e)->text();
 
@@ -21,6 +22,7 @@ public:
 
 			this->model()->setData(idx, currentValue.toString() + pressedChar, Qt::UserRole);
 		}
+		*/
 
 		return QTableView::event(e);
 	}
@@ -42,4 +44,33 @@ public:
 
 private:
 	bool mFocus{false};
+};
+
+
+#include <QStyledItemDelegate>
+#include <QLineEdit>
+
+class TableDelegate : public QStyledItemDelegate
+{
+public:
+	explicit TableDelegate(QAbstractItemModel& model) :
+		mModel(model)
+	{}
+
+	void setEditorData(QWidget* editor, const QModelIndex& index) const override
+	{
+		QStyledItemDelegate::setEditorData(editor, index);
+
+		QLineEdit* lineEdit = qobject_cast<QLineEdit*>(editor);
+		if (lineEdit)
+		{
+			connect(lineEdit, &QLineEdit::textChanged, this, [this, index](const QString& text)
+			{
+				mModel.setData(index, text, Qt::UserRole);
+			});
+		}
+	}
+
+private:
+	QAbstractItemModel& mModel;
 };
