@@ -12,4 +12,7 @@ add_executable(qtableview
 	table_model.cc
 )
 target_compile_options(qtableview PRIVATE -std=c++14 -g)
+
+# due to Qt5
+target_compile_options(qtableview PRIVATE -Wno-inconsistent-missing-override)
 qt5_use_modules(qtableview Widgets)
