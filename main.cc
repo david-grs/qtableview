@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QTableView>
 #include <QTableView>
+#include <QSortFilterProxyModel>
 
 int main(int argc, char *argv[])
 {
