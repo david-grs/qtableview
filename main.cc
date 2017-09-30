@@ -12,11 +12,10 @@ int main(int argc, char *argv[])
 	QTableView table;
 	TableModel model;
 
-	QSortFilterProxyModel proxyModel;
-	proxyModel.setSourceModel(&model);
-	table.setModel(&proxyModel);
-
+	//QSortFilterProxyModel proxyModel;
+	//proxyModel.setSourceModel(&model);
 	table.setModel(&model);
+
 	table.setSortingEnabled(true);
 	table.sortByColumn(0, Qt::AscendingOrder);
 	table.reset();

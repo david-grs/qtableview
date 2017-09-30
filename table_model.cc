@@ -22,3 +22,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 	return QVariant();
 }
 
+QModelIndex TableModel::index(int row, int column, const QModelIndex&) const
+{
+	return QAbstractItemModel::createIndex(row, column, Q_NULLPTR);
+}
