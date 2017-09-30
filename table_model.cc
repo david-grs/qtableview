@@ -14,10 +14,10 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
 {
 	switch (role)
 	{
-	case Qt::DisplayRole:
-	{
-		return 4 - index.row() + index.column();
-	}
+		case Qt::DisplayRole:
+		{
+			return 4 - index.row() + index.column();
+		}
 	}
 	return QVariant();
 }
@@ -26,3 +26,9 @@ QModelIndex TableModel::index(int row, int column, const QModelIndex&) const
 {
 	return QAbstractItemModel::createIndex(row, column, Q_NULLPTR);
 }
+
+void TableModel::sort(int column, Qt::SortOrder order)
+{
+
+}
+
