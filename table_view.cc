@@ -1,12 +1,14 @@
 #include "table_view.h"
 
+#include <QAbstractItemModel>
 #include <QHeaderView>
 #include <QTimer>
 #include <QSettings>
 
 #include <iostream>
 
-TableView::TableView()
+TableView::TableView(QAbstractItemModel& model) :
+	mModel(model)
 {
 	setSortingEnabled(true);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -26,51 +28,36 @@ TableView::TableView()
 
 	verticalHeader()->hide();
 
-	connect(&header, &QHeaderView::sectionMoved, this, [this](int logicalIndex, int oldVisualIndex, int newVisualIndex)
+	connect(&header, &QHeaderView::sectionMoved, this, [this](int logicalIndex, int /*oldVisualIndex*/, int newVisualIndex)
 	{
-		std::cout << logicalIndex << " " << oldVisualIndex << " " << newVisualIndex << std::endl;
-		SaveSettings();
+		const QString columnName = mModel.headerData(logicalIndex, Qt::Horizontal, Qt::DisplayRole).toString();
+		mColumnPosition[columnName] = newVisualIndex;
 	});
 
-	connect(&header, &QHeaderView::sectionResized, this, [this](int logicalIndex, int oldSize, int newSize)
+	connect(&header, &QHeaderView::sectionResized, this, [this](int logicalIndex, int /*oldSize*/, int newSize)
 	{
-		std::cout << logicalIndex << " " << oldSize << " " << newSize << std::endl;
-		SaveSettings();
+		const QString columnName = mModel.headerData(logicalIndex, Qt::Horizontal, Qt::DisplayRole).toString();
+		mColumnSize[columnName] = newSize;
 	});
-
-	//QTimer::singleShot(0, this, SLOT(LoadSettings()));
 }
 
-void TableView::SaveSettings()
+QMap<QString, QVariantMap> TableView::saveSettings()
 {
-	QByteArray state = horizontalHeader()->saveState();
-
-	QFile file("settings.data");
-	file.open(QIODevice::WriteOnly);
-	file.write(state);
-	file.close();
-
-	QSettings MySetting(QSettings::IniFormat, QSettings::UserScope, "Test");
-		MySetting.setValue("column_width", state);
-
-	std::cout << "bla =  " << MySetting.fileName().toStdString() << std::endl;
+	QMap<QString, QVariantMap> m;
+	m["column_position"] = mColumnPosition;
+	m["column_size"] = mColumnSize;
+	m["column_visibility"] = mColumnVisibility;
+	return m;
 }
 
-void TableView::LoadSettings()
+void TableView::setColumnVisibility(int column, bool show)
 {
-	QFile file("settings.data");
-	file.open(QIODevice::ReadOnly);
-	QByteArray state = file.readAll();
-	file.close();
+	const QString columnName = mModel.headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+	mColumnVisibility[columnName] = show;
 
-	if (horizontalHeader()->restoreState(state))
-		std::cout << "success";
+	if (show)
+		showColumn(column);
 	else
-		std::cout << "fail";
-
-	std::cout << std::endl;
-
-	for (int i = 0; i < horizontalHeader()->count(); ++i)
-		std::cout << "section " << i << ": " << horizontalHeader()->isSectionHidden(i) << std::endl;
-
+		hideColumn(column);
 }
+

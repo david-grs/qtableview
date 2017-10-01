@@ -1,19 +1,22 @@
 #pragma once
 
+#include <QVariantMap>
 #include <QTableView>
 #include <QKeyEvent>
+
+class QAbstractItemModel;
 
 class TableView : public QTableView
 {
 	Q_OBJECT
 
 public:
-	TableView();
+	TableView(QAbstractItemModel&);
 
-	void SaveSettings();
+	QMap<QString, QVariantMap> saveSettings();
 
-protected slots:
-	void LoadSettings();
+public slots:
+	void setColumnVisibility(int column, bool show);
 
 private:
 	bool event(QEvent* e) override
@@ -54,6 +57,11 @@ private:
 
 private:
 	bool mFocus{false};
+	QAbstractItemModel& mModel;
+
+	QVariantMap mColumnPosition;
+	QVariantMap mColumnSize;
+	QVariantMap mColumnVisibility;
 };
 
 

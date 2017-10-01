@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	TableView table;
 	TableModel model;
+	TableView table(model);
 	TableController controller(table, model);
 	TableDelegate delegate(model);
 
