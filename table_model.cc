@@ -6,31 +6,8 @@ TableModel::TableModel()
 
 void TableModel::sort(int column, Qt::SortOrder order)
 {
-	//const std::string& colName = mColumns.at(column);
-	//const bool asc = order == Qt::AscendingOrder;
-
-	emit sorted(column, order);
-	/*
-	rj::Document res;
-	auto& allocator = res.GetAllocator();
-
-	res.SetObject();
-	res.AddMember("field", rj::Value(colName.c_str(), allocator), allocator);
-	res.AddMember("order", rj::Value(asc ? "asc" : "desc", allocator), allocator);
-
-	QString json;
-
-	{
-		rj::StringBuffer buffer;
-		rj::Writer<rj::StringBuffer> writer(buffer);
-		res.Accept(writer);
-		json.append(buffer.GetString());
-	}
-
-	mWebSocket.sendTextMessage(json);
-	*/
+	emit sortRequested(column, order);
 }
-
 
 bool TableModel::insertColumns(int column, int count, const QModelIndex &parent)
 {

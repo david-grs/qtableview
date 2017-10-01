@@ -16,6 +16,8 @@ int main(int argc, char *argv[])
 	TableController controller(table, model);
 	TableDelegate delegate(model);
 
+	QObject::connect(&model, &TableModel::sortRequested, &controller, &TableController::sort);
+
 	//QSortFilterProxyModel proxyModel;
 	//proxyModel.setSourceModel(&model);
 	table.setModel(&model);

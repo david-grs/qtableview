@@ -15,10 +15,13 @@ class TableController : public QObject
 public:
 	TableController(QTableView&, QAbstractItemModel&);
 
+public slots:
+	void sort(int, Qt::SortOrder);
+
 private slots:
-	void OnWebSocketConnected();
-	void OnWebSocketDisconnected();
-	void OnWebSocketMessage(QString message);
+	void webSocketConnected();
+	void webSocketDisconnected();
+	void webSocketMessage(QString message);
 
 private:
 	QUrl mUrl;

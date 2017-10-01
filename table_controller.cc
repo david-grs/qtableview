@@ -13,30 +13,57 @@ TableController::TableController(QTableView& view, QAbstractItemModel& model) :
 	mView(view),
 	mModel(model)
 {
-	connect(&mWebSocket, &QWebSocket::connected, this, &TableController::OnWebSocketConnected);
-	connect(&mWebSocket, &QWebSocket::disconnected, this, &TableController::OnWebSocketDisconnected);
+	connect(&mWebSocket, &QWebSocket::connected, this, &TableController::webSocketConnected);
+	connect(&mWebSocket, &QWebSocket::disconnected, this, &TableController::webSocketDisconnected);
 	mWebSocket.open(QUrl("ws://127.0.0.1:8080/"));
 }
 
-void TableController::OnWebSocketConnected()
+void TableController::sort(int column, Qt::SortOrder order)
+{
+	const QByteArray columnName = mModel.headerData(column, Qt::Horizontal, Qt::DisplayRole).toString().toLatin1();
+	const bool asc = order == Qt::AscendingOrder;
+
+	{
+		rj::Document res;
+		auto& allocator = res.GetAllocator();
+
+		res.SetObject();
+		res.AddMember("field", rj::Value(columnName.data(), allocator), allocator);
+		res.AddMember("order", rj::Value(asc ? "asc" : "desc", allocator), allocator);
+
+		QString json;
+
+		{
+			rj::StringBuffer buffer;
+			rj::Writer<rj::StringBuffer> writer(buffer);
+			res.Accept(writer);
+			json.append(buffer.GetString());
+		}
+
+		qDebug() << "sending message" << json;
+		mWebSocket.sendTextMessage(json);
+	}
+}
+
+void TableController::webSocketConnected()
 {
 	qDebug() << "websocket, connected";
 
-	connect(&mWebSocket, &QWebSocket::textMessageReceived, this, &TableController::OnWebSocketMessage);
+	connect(&mWebSocket, &QWebSocket::textMessageReceived, this, &TableController::webSocketMessage);
 
 	// TODO send subscribe feed
 }
 
-void TableController::OnWebSocketDisconnected()
+void TableController::webSocketDisconnected()
 {
 	qDebug() << "websocket, disconnected";
 
 	mModel.removeRows(0, mModel.rowCount());
 
-	QTimer::singleShot(1000, this, SLOT(OnWebSocketConnected()));
+	QTimer::singleShot(1000, this, SLOT(webSocketConnected()));
 }
 
-void TableController::OnWebSocketMessage(QString json)
+void TableController::webSocketMessage(QString json)
 {
 	mDocument.Parse(json.toStdString().c_str());
 

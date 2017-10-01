@@ -35,7 +35,7 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 signals:
-	void sorted(int column, Qt::SortOrder order);
+	void sortRequested(int column, Qt::SortOrder order);
 
 private:
 	std::vector<QString> mFilters;
