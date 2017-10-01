@@ -14,11 +14,16 @@ public:
 	TableView(QAbstractItemModel&);
 
 	QMap<QString, QVariantMap> saveSettings();
+	void loadSettings(QMap<QString, QVariantMap> settings);
 
 public slots:
 	void setColumnVisibility(int column, bool show);
 
 private:
+	void loadPositionSettings(QVariantMap);
+	void loadSizeSettings(QVariantMap);
+	void loadVisibilitySettings(QVariantMap);
+
 	bool event(QEvent* e) override
 	{
 		/*
