@@ -1,5 +1,8 @@
 #include "table_model.h"
 
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 namespace rj = rapidjson;
 
 TableModel::TableModel()
@@ -14,12 +17,44 @@ void TableModel::OnWebSocketConnected()
 	qDebug() << "websocket, connected";
 
 	connect(&mWebSocket, &QWebSocket::textMessageReceived, this, &TableModel::OnWebSocketMessage);
-	mWebSocket.sendTextMessage(QStringLiteral("Hello, world!"));
+
+#if 0
+	rj::Document res;
+	rj::Document::AllocatorType& allocator = res.GetAllocator();
+
+	res.SetObject();
+	res.AddMember("message", "feed_subscribe", res.GetAllocator())
+	mWebSocket.sendTextMessage(QStringLiteral("{\"\"}"));
+#endif
 }
 
 void TableModel::OnWebSocketDisconnected()
 {
 	qDebug() << "websocket, disconnected";
+}
+
+void TableModel::sort(int column, Qt::SortOrder order)
+{
+	const std::string& colName = mColumns.at(column);
+	const bool asc = order == Qt::AscendingOrder;
+
+	rj::Document res;
+	auto& allocator = res.GetAllocator();
+
+	res.SetObject();
+	res.AddMember("field", rj::Value(colName.c_str(), allocator), allocator);
+	res.AddMember("order", rj::Value(asc ? "asc" : "desc", allocator), allocator);
+
+	QString json;
+
+	{
+		rj::StringBuffer buffer;
+		rj::Writer<rj::StringBuffer> writer(buffer);
+		res.Accept(writer);
+		json.append(buffer.GetString());
+	}
+
+	mWebSocket.sendTextMessage(json);
 }
 
 void TableModel::OnWebSocketMessage(QString json)
@@ -215,9 +250,5 @@ bool TableModel::setHeaderData(int section, Qt::Orientation orientation, const Q
 	}
 
 	return false;
-}
-
-void TableModel::sort(int column, Qt::SortOrder order)
-{
 }
 
