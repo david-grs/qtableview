@@ -16,6 +16,9 @@ TableView::TableView()
 
 	QHeaderView& headerView = *horizontalHeader();
 	headerView.setSectionsMovable(true);
+	headerView.show();
+
+	verticalHeader()->hide();
 
 	connect(&headerView, &QHeaderView::sectionMoved, this, [this](int logicalIndex, int oldVisualIndex, int newVisualIndex)
 	{
@@ -29,7 +32,7 @@ TableView::TableView()
 		SaveSettings();
 	});
 
-	QTimer::singleShot(0, this, SLOT(LoadSettings()));
+	//QTimer::singleShot(0, this, SLOT(LoadSettings()));
 }
 
 void TableView::SaveSettings()
@@ -43,7 +46,8 @@ void TableView::SaveSettings()
 
 	QSettings MySetting(QSettings::IniFormat, QSettings::UserScope, "Test");
 		MySetting.setValue("column_width", state);
-std::cout << "bla =  " << MySetting.fileName().toStdString() << std::endl;
+
+	std::cout << "bla =  " << MySetting.fileName().toStdString() << std::endl;
 }
 
 void TableView::LoadSettings()
