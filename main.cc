@@ -5,7 +5,6 @@
 #include <QTableView>
 #include <QTableView>
 #include <QSortFilterProxyModel>
-#include <QHeaderView>
 
 int main(int argc, char *argv[])
 {
@@ -20,12 +19,6 @@ int main(int argc, char *argv[])
 	table.setModel(&model);
 	table.setItemDelegateForRow(0, &delegate);
 
-	table.horizontalHeader()->setSectionsMovable(true);
-	table.setSortingEnabled(true);
-	table.setSelectionBehavior(QAbstractItemView::SelectRows);
-	table.setSelectionMode(QAbstractItemView::ExtendedSelection);
-	table.setEditTriggers(QAbstractItemView::AllEditTriggers);
-	table.sortByColumn(0, Qt::AscendingOrder);
 	table.reset();
 	table.show();
 

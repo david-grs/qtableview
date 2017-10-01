@@ -14,7 +14,7 @@ int TableModel::rowCount(const QModelIndex&) const
 
 int TableModel::columnCount(const QModelIndex&) const
 {
-	return 2;
+	return 4;
 }
 
 QVariant TableModel::data(const QModelIndex& index, int role) const
@@ -62,6 +62,7 @@ bool TableModel::setData(const QModelIndex& index, const QVariant& value, int ro
 
 void TableModel::sort(int column, Qt::SortOrder order)
 {
+	std::cout << "sort " << column << std::endl;
 
 }
 

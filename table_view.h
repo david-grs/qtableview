@@ -5,7 +5,17 @@
 
 class TableView : public QTableView
 {
+	Q_OBJECT
+
 public:
+	TableView();
+
+	void SaveSettings();
+
+protected slots:
+	void LoadSettings();
+
+private:
 	bool event(QEvent* e) override
 	{
 		/*
