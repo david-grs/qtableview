@@ -2,7 +2,6 @@
 
 #include <QAbstractTableModel>
 #include <QtWebSockets/QWebSocket>
-#include <QMap>
 
 #include <rapidjson/document.h>
 
