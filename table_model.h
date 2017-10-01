@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QAbstractTableModel>
+#include <QtWebSockets/QWebSocket>
 
 #include <vector>
 
@@ -21,6 +22,14 @@ public:
 	QModelIndex index(int row, int column, const QModelIndex& parent) const override;
 	QModelIndex parent(const QModelIndex&) const override { return {}; }
 
+private slots:
+	void OnWebSocketConnected();
+	void OnWebSocketDisconnected();
+	void OnWebSocketMessage(QString message);
+
 private:
+	QUrl mUrl;
+	QWebSocket mWebSocket;
+
 	std::vector<QString> mFilters;
 };

@@ -4,7 +4,29 @@
 
 TableModel::TableModel()
 {
+	connect(&mWebSocket, &QWebSocket::connected, this, &TableModel::OnWebSocketConnected);
+	connect(&mWebSocket, &QWebSocket::disconnected, this, &TableModel::OnWebSocketDisconnected);
+	mWebSocket.open(QUrl("ws://127.0.0.1:8080/"));
+
 	mFilters.resize(columnCount());
+}
+
+void TableModel::OnWebSocketConnected()
+{
+	qDebug() << "websocket, connected";
+
+	connect(&mWebSocket, &QWebSocket::textMessageReceived, this, &TableModel::OnWebSocketMessage);
+	mWebSocket.sendTextMessage(QStringLiteral("Hello, world!"));
+}
+
+void TableModel::OnWebSocketDisconnected()
+{
+	qDebug() << "websocket, disconnected";
+}
+
+void TableModel::OnWebSocketMessage(QString message)
+{
+	qDebug() << "websocket, received message " << message;
 }
 
 int TableModel::rowCount(const QModelIndex&) const

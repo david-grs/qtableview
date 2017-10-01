@@ -6,7 +6,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt5WebSockets REQUIRED)
+
 add_executable(qtableview
 	main.cc
 	table_model.cc
@@ -16,4 +17,4 @@ target_compile_options(qtableview PRIVATE -std=c++14 -g)
 
 # due to Qt5
 target_compile_options(qtableview PRIVATE -Wno-inconsistent-missing-override)
-qt5_use_modules(qtableview Widgets)
+qt5_use_modules(qtableview Widgets WebSockets)
