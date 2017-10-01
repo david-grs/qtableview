@@ -158,7 +158,8 @@ QVariant TableModel::data(const QModelIndex& index, int role) const
 		}
 		else if (index.row() > 0)
 		{
-			const Row& row = mRows[index.row() - 1];
+			// cf setData(): row "1" = last row, as we append every row in the underlying vector but we prepend them to the view
+			const Row& row = mRows[mRows.size() - index.row()];
 
 			if (row.size() > index.column())
 				return row[index.column()];
@@ -190,7 +191,9 @@ bool TableModel::setData(const QModelIndex& index, const QVariant& value, int ro
 	}
 	else if (index.row() > 0 && role == Qt::DisplayRole)
 	{
-		mRows.at(index.row() - 1).at(index.column()) = value.toString();
+		// row "1" = last row, as we append every row in the underlying vector but we prepend them to the view
+		const int row = mRows.size() - index.row();
+		mRows.at(row).at(index.column()) = value.toString();
 		qDebug() << "set data " << index.row() << "," << index.column() << " to " << value.toString();
 
 		emit dataChanged(index, index);
