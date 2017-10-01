@@ -14,19 +14,25 @@ TableView::TableView()
 	setEditTriggers(QAbstractItemView::AllEditTriggers);
 	sortByColumn(0, Qt::AscendingOrder);
 
-	QHeaderView& headerView = *horizontalHeader();
-	headerView.setSectionsMovable(true);
-	headerView.show();
+	{
+		QHeaderView& header = *verticalHeader();
+		header.setSectionResizeMode(QHeaderView::Fixed);
+		header.setDefaultSectionSize(24);
+	}
+
+	QHeaderView& header = *horizontalHeader();
+	header.setSectionsMovable(true);
+	header.show();
 
 	verticalHeader()->hide();
 
-	connect(&headerView, &QHeaderView::sectionMoved, this, [this](int logicalIndex, int oldVisualIndex, int newVisualIndex)
+	connect(&header, &QHeaderView::sectionMoved, this, [this](int logicalIndex, int oldVisualIndex, int newVisualIndex)
 	{
 		std::cout << logicalIndex << " " << oldVisualIndex << " " << newVisualIndex << std::endl;
 		SaveSettings();
 	});
 
-	connect(&headerView, &QHeaderView::sectionResized, this, [this](int logicalIndex, int oldSize, int newSize)
+	connect(&header, &QHeaderView::sectionResized, this, [this](int logicalIndex, int oldSize, int newSize)
 	{
 		std::cout << logicalIndex << " " << oldSize << " " << newSize << std::endl;
 		SaveSettings();
