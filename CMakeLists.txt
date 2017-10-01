@@ -12,6 +12,7 @@ add_executable(qtableview
 	main.cc
 	table_model.cc
 	table_view.cc
+	table_controller.cc
 )
 target_compile_options(qtableview PRIVATE -std=c++14 -g)
 

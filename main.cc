@@ -1,5 +1,6 @@
 #include "table_model.h"
 #include "table_view.h"
+#include "table_controller.h"
 
 #include <QApplication>
 #include <QTableView>
@@ -12,6 +13,7 @@ int main(int argc, char *argv[])
 
 	TableView table;
 	TableModel model;
+	TableController controller(table, model);
 	TableDelegate delegate(model);
 
 	//QSortFilterProxyModel proxyModel;

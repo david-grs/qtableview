@@ -3,12 +3,15 @@
 #include <QAbstractTableModel>
 #include <QtWebSockets/QWebSocket>
 
-#include <rapidjson/document.h>
+#include <QString>
+#include <QVariant>
 
 #include <vector>
 
 class TableModel : public QAbstractItemModel
 {
+	Q_OBJECT
+
 public:
 	TableModel();
 
@@ -31,21 +34,13 @@ public:
 	bool insertColumns(int column, int count, const QModelIndex &parent = QModelIndex()) override;
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
-private slots:
-	void OnWebSocketConnected();
-	void OnWebSocketDisconnected();
-	void OnWebSocketMessage(QString message);
+signals:
+	void sorted(int column, Qt::SortOrder order);
 
 private:
-	QUrl mUrl;
-	QWebSocket mWebSocket;
-
 	std::vector<QString> mFilters;
 	std::vector<std::string> mColumns;
 
 	using Row = std::vector<QVariant>;
 	std::vector<Row> mRows;
-
-	rapidjson::Document mDocument; // no state, re-use only
-
 };

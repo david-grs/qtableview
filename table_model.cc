@@ -1,43 +1,16 @@
 #include "table_model.h"
 
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/writer.h>
-
-namespace rj = rapidjson;
-
 TableModel::TableModel()
 {
-	connect(&mWebSocket, &QWebSocket::connected, this, &TableModel::OnWebSocketConnected);
-	connect(&mWebSocket, &QWebSocket::disconnected, this, &TableModel::OnWebSocketDisconnected);
-	mWebSocket.open(QUrl("ws://127.0.0.1:8080/"));
-}
-
-void TableModel::OnWebSocketConnected()
-{
-	qDebug() << "websocket, connected";
-
-	connect(&mWebSocket, &QWebSocket::textMessageReceived, this, &TableModel::OnWebSocketMessage);
-
-#if 0
-	rj::Document res;
-	rj::Document::AllocatorType& allocator = res.GetAllocator();
-
-	res.SetObject();
-	res.AddMember("message", "feed_subscribe", res.GetAllocator())
-	mWebSocket.sendTextMessage(QStringLiteral("{\"\"}"));
-#endif
-}
-
-void TableModel::OnWebSocketDisconnected()
-{
-	qDebug() << "websocket, disconnected";
 }
 
 void TableModel::sort(int column, Qt::SortOrder order)
 {
-	const std::string& colName = mColumns.at(column);
-	const bool asc = order == Qt::AscendingOrder;
+	//const std::string& colName = mColumns.at(column);
+	//const bool asc = order == Qt::AscendingOrder;
 
+	emit sorted(column, order);
+	/*
 	rj::Document res;
 	auto& allocator = res.GetAllocator();
 
@@ -55,89 +28,9 @@ void TableModel::sort(int column, Qt::SortOrder order)
 	}
 
 	mWebSocket.sendTextMessage(json);
+	*/
 }
 
-void TableModel::OnWebSocketMessage(QString json)
-{
-	mDocument.Parse(json.toStdString().c_str());
-
-	const std::string message = mDocument["message"].GetString();
-	if (message == "feed_definition")
-	{
-		auto it = mDocument.FindMember("fields");
-
-		if (it == mDocument.MemberEnd() || !it->value.IsArray())
-		{
-			qWarning() << "malformed feed_definition";
-			assert(false);
-			return;
-		}
-
-		const rj::Value& fields = it->value;
-		const int columnCount = fields.Capacity();
-
-		insertColumns(0, columnCount);
-
-		int column = 0;
-		for (rj::Value::ConstValueIterator it = fields.Begin(); it != fields.End(); ++it)
-		{
-			const char* colName = it->GetString();
-
-			qDebug() << "set col index" << column << "to" << colName;
-			setHeaderData(column, Qt::Horizontal, QObject::tr(colName), Qt::DisplayRole);
-
-			++column;
-		}
-	}
-	else if (message == "feed")
-	{
-		assert(!mColumns.empty());
-
-		insertRow(1);
-
-		int column = 0;
-		for (const std::string& field : mColumns)
-		{
-			QVariant data;
-
-			auto it = mDocument.FindMember(field.c_str());
-			if (it != mDocument.MemberEnd())
-			{
-				const rj::Value& value = it->value;
-
-				if (value.IsString())
-				{
-					data = QString(value.GetString());
-				}
-				else if (value.IsBool())
-				{
-					data = value.GetBool();
-				}
-				else if (value.IsDouble())
-				{
-					data = value.GetDouble();
-				}
-				else if (value.IsInt())
-				{
-					data = value.GetInt();
-				}
-				else
-				{
-					qWarning() << "unspported type for field" << field.c_str();
-				}
-			}
-			else
-			{
-				qWarning() << "field" << field.c_str() << "not found";
-			}
-
-			setData(index(1, column), data, Qt::DisplayRole);
-			++column;
-		}
-
-		qDebug() << "insert row, rows=" << mRows.size();
-	}
-}
 
 bool TableModel::insertColumns(int column, int count, const QModelIndex &parent)
 {
